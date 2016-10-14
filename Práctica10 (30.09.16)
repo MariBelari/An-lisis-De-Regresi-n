@@ -1,0 +1,59 @@
+### Práctica10 (30.09.16)
+
+#----------------------------------------------------------------
+#Después de analizar graficamente se aplican pruebas para confirmar que el MRM
+#si cumple con los supuestos. Para aplicar estas pruebas se generan los valores
+#ajustados, residuales y los estandarizados
+mochil$ajustados <- fitted(modmo) #dato ajustado= y^
+mochil$res <- residuals(modmo) #cercanos a cero
+#View(mochil)
+mochil$rtud <- rstudent(modmo) #errores estandarizados
+
+# P R U E B A S #
+#1) NORMALIDAD
+install.packages("lmtest")
+require(lmtest)
+ks.test(mochil$rtud, "pnorm") #Se plantea prueba de hipotesis, se espera un
+#p-value>0.05, si esto ocurre no se rechaza H0 y se acepta que hay normalidad
+#En este caso se pasa la prueba de normalidad
+
+#2) HOMOGENEIDAD DE VARIANZAS
+bptest(modmo, studentize = FALSE, data = mochil) #2do argumento: no tomar datos
+#(errores) estandarizados. Tenemos p-value>.05 por lo tanto pasa la prueba
+#de homogeneidad de varianzas
+
+#3) AUTOCORRELACIÓN (durbin watson)
+dwtest(modmo, alternative = "two.sided", data = mochil)
+#En esta prueba hay 2 formas para comprobar 
+#i)p-value>0.05; 
+#ii)valor durbin watson, rango aceptable (1.5, 2.5) i.e. independencia 
+#entre los errores, no correlación entre los errores
+#Hasta aquí podriamos confirmar que no hay correlación entre los residuos
+#Se confirma que tenemos un modelo con buen ajuste, sin embargo hay que revisar
+#los casos atípicos; para revisar:
+install.packages("car")
+require(car)
+
+#Procedemos a conocer la influencia de estos casos atípicos en el modelo
+influencia <- influence.measures(modmo)
+summary(influencia)
+#1er columna: casos influyentes= 1, 2, 10
+#columnas dfb: nos indican la influencia de los coeficientes del modelo
+#columnas cook.d y hat: mayor interés, nos exponen mayor claridad, la primera 
+#es la distancia de cook, entre más cercano a 1 hay mayor influencia de la
+#observación, en este caso la observación 10 es la que tiene mayor distancia
+#de cook (cercana a 1); la columna hat se asocia con las medidas de leverage 
+#que varían entre 0 y 1, entre más cercano a 1, mayor incluencia
+
+#ANÁLISIS GRÁFICO, de los casos influyentes
+#El análisis de éste gráfico se realiza con base en el tamaño de las 
+#circunferencias que arroja, i.e. a >circunferencia el caso tiene mayor
+#influencia
+#influencePlot(modmo)
+#install.packages("stats")
+require(faraway)
+dc <- cooks.distance(modmo)
+etiqueta <- rownames(mochil)
+halfnorm(dc, 3, etiqueta)
+
+#El modelo corre todas las pruebas, sin embargo se sugiere eliminar la observación 10

@@ -1,0 +1,49 @@
+### Práctica5 (01.09.16)
+
+#   MODELO DE REGRESION LINEAL   #
+
+# Hacer un vector
+# estaturas 1.2, 1.23, 1.19, 1.32, 1.28, 1.22, 1.17, 1.29, 1.33, 1.15
+# nivel economico 110,130,108,167,156,115,104,138,170,107
+# queremos comprobar la hipotesis que entre mayor ingreso de la familia hay una mayor estatura en lxs niñxs
+esta <- c(1.2, 1.23, 1.19, 1.32, 1.28, 1.22, 1.17, 1.29, 1.33, 1.15)
+eco <- c(110, 130, 108, 167, 156, 115, 104, 138, 170, 107)
+
+# 1er paso, grafico de dispersion
+# graficar (var depen, var indepen, pch= tipo de puntos, xlab=, ylab=, main=)
+plot (eco, esta, pch= 3, xlab="ingreso economico", ylab="estatura", main="grafica de dispersion", col=20)
+
+# 2do paso, ver correlaciones
+#para calcular CC se utiliza
+# la forma general de cor() es...
+# argumentos: var depen, var indepen, use= usar sin datos perdidos, method=pearson
+help(cor)
+cor(esta, eco, method="pearson")
+# El valor obtenido -> (muy alta correlacion positiva)
+# para datos ordinales -> kendall
+
+# 3er paso, Prueba de hipotesis a la correlacion, 
+#nula= H0=r=0 (sin relacion),,, Ha=!0 (si hay relacion)
+cor.test(esta, eco, method="pearson")
+# si p-value < 0.05 se rechaza H0, aceptar Ha con 95% de confianza, i.e hay relacion
+
+# 4to paso, ya que se confirma la correlacion se aplica el modelo, mediante la fn lm()
+# asignar nombre a modelo, (var depen + signo aproximacion + var indepen)
+mod1 <- lm(esta~eco)
+# resumen del modelo
+summary(mod1)
+# analisis de residuales: diferencias entre valores ajustados y reales (min, 1q, mediana, 3q, max)
+# genera COEFICIENTES: *** datos significativos o no, minimos errores
+# pr<0.05
+# * -> 95% confianza de que son significativos
+# Ajusta una recta de acuerdo a los datos reales: y=B0+B1X
+
+# 5to paso, Graficasr nuevamente
+plot(eco, esta, pch=11, xlab="ingresos", ylab="estatura", main="Grafica de dispersion")
+# recta ajustada con base a coeficientes
+abline(mod1)
+
+# plantear la ecuacion, con datos de intercepto y eco: y=B0+B1X
+esta= .9323692 + .0023420 eco
+
+# TAREA: PLANTEAR UN MODELO, HACIENDO UNA HIPOTESIS CON VARIABLES DE LA REALIDAD, MINIMO 16 DATOS

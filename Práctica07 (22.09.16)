@@ -1,0 +1,66 @@
+### Práctica7 (22.09.16)
+
+#-----------------------------------------------------------------------------------------#
+install.packages("car")
+
+base1<-data.frame(eco,esta)
+
+base1$ajuste.mod1<-fitted(mod1) #valor ajustado
+base1$residuales.mod1<-residuals(mod1) #residuos del modelo
+base1$rstudent.mod1<-rstudent(mod1) #residuos estudentizados
+
+#Esta variable se utiliza para comprobar los supuestos
+#Supuesto de normalidad, i.e. que los residuos tengan una distribucion normal
+#Para conocer la normalidad se utiliza la prueba de shapiro para anlizar los residuos
+shapiro.test(base1$rstudent.mod1)
+#Prueba de hipotesis shapiro test
+#H0. La muestra tiene una dist normal
+#Ha. La muestra no tiene una dist normal
+#Tenemos un pvalue de .8172 no se rechaza la hipotesis nula
+#Por lo tanto se acepta que hay normalidad
+#Ahora veremos este resultado en un grafico
+qqnorm(base1$rstudent.mod1, main="Normal (0,1)")
+#Se obtiene grafico de dispersion con la normal 0,1
+qqline(base1$rstudent.mod1)
+#Ahora vamos a revisar la homogeneidad de varianzas
+#Se requiere de una libreria que se llama lmtest
+#Se aplica la prueba Breusch- pagan test
+install.packages("lmtest")
+require(lmtest)
+bptest(mod1)
+#En esta prueba esperamos que haya homogeneidad de la varianza
+#H0. Si hay homogeneidad en las varianzas
+#Ha. No hay homogeneidad en las varianzas
+#En prueba bptest obtenemos pvalue de 0.618 por lo tanto no se rechaza H0,
+#i.e. se acepta con 95% de confianza la H0.
+#Para esto debemos de tener un pvalue mayor a 0.5, por lo que para
+#mod1 se puede decir que hay homogeneidad en la variable
+
+#Prueba de autocorrelacion o independencia
+#En este caso se utiliza la prueba de Durbin Watson
+require(car)
+dwtest(mod1, alternative = "two.sided")
+#H0. Hay autocorrelación en los residuos
+#Ha. Si hay autocorrelación en los residuos
+#La prueba durbin watson genera un resultado pvalue de 0.9142, 
+#Por lo que no se rechaza la H0
+#Otra manera: Si esta dentro del rango 1.5<DW<2.5 NO hay autocorrelación
+
+#De manera grafica
+plot(base1$residuales.mod1, pch=20, ylab = "Residuales", xlab = "In", col=52)
+abline(h=cor (base1$esta, base1$eco))
+#En este caso es una grafica sin relacion
+#Por lo tanto confirma que no hay autocorrelacion
+
+#Con estos datos se garantiza que tenemos un buen modelo
+#Y podremos predecir o analizar los coeficientes
+
+#Podremos tener un problema de rangos si predecimos sin considerar rangos de nuestra variable
+#Definiremos una nueva base con los limites
+limbase1 <- seq(min(base1$eco), max(base1$eco), length=10)
+limbase1 <- data.frame(limbase1)
+limbasep <- predict.lm (mod1, limbase1, interval = "prediction", se.fit = TRUE, data=base1)
+head(limbasep$fit) #Genera los limites 
+
+#Dibujar los limites
+matplot(limbase1, limbasep$fit, type = "l", xlab = "Ingreso", ylab = "Estatura")

@@ -1,0 +1,66 @@
+### Práctica9 (29.09.16)
+
+#MODELO DE REGRESIÓN MÚLTIPLE
+
+install.packages("foreign")
+require(foreign)
+
+capa <- c(4330, 5500, 5500, 4700, 5200, 5500, 4700, 5500, 5800, 5000) #Independiente (x2)
+calidad <- c(2, 3, 4, 3, 4, 4, 4, 5, 5, 5) #Independiente (x1)
+precio <- c(190, 219, 249, 249, 250, 340, 289, 395, 439, 525) #Dependiente (y)
+
+mochil <- data.frame (precio, capa, calidad)
+
+#Aplicar correlación
+cor(mochil, use="everything", method="pearson")
+#Observamos que las variables tienen correlaciones diversas, en el cruce de
+#variables iguales, la correlacion es total=1
+
+#Aplicar modelo
+modmo <- lm(precio~calidad+capa)
+summary(modmo)
+#Se usa la R ajustada=0.704 lo que implica que la recta de regresión explica
+#en 70% la variabilidad del modelo. Revisando valor de F y p-value 
+#Un buen ajuste: F>1, p-value<0.5. Con esto decimos que estamos ante un buen
+#modelo por lo que se pasa al DIAGNOSTICO el cual se realiza para poder 
+#generalizar los resultados del modelo a partir de la revisión de los supuestos
+
+# :::En MRM:::
+
+#1) Observar graficamente los supuestos, VARIANZA CONSTANTE
+#Se contrastan los valores residuales contra los valores ajustados
+#plot, pch->cambiar figura de puntos
+plot(modmo, which=1, pch=3)
+#Aquí esperamos que los residuos se distribuyan sin patron
+#Una tendencia en la variabilidad de los residuos sugiere que la varianza está
+#relacionada con la media, violando el supuesto se varianza constante
+
+#2) Grafico de NORMALIDAD
+plot(modmo, which=2, pch=3)
+#Aquí esperamos que los residuos tipificados alrededor de la linea se observa
+#que sí hay distribución normal
+
+#3) RESIDUOS ESTANDARIZADOS
+#Los residuos están estandarizados por sus desviaciones estandar estimadas
+plot(modmo, which=3, pch=3)
+#Los residuos se distribuyen constantes en los valores ajustados. Una grafica
+#sin patron observables
+
+#4)
+plot(modmo, which=5, pch=3)
+#Expone la importancia de cada observación en el modelo; en esta distancia el
+#grafico nos muestra las observaciones que podrán impactar en el modelo, por lo
+#que se sugiere eliminarlas
+
+#data.frame es una matriz, eliminar las observaciones 1, 7, 10, ya que causan
+#ruido en el modelo
+mochil1 <- mochil[c(-1, -7, -10),] #renglones, columnas
+mochil2 <- mochil[,-2]
+
+cor(mochil1, use="everything", method="pearson")
+modmo1 <- lm(precio~calidad+capa, mochil1)
+plot(modmo1, which=5, pch=3)
+#Otra forma:
+modmo2<- lm(mochil1$recio~mochil1$calidad+mochil1$capa)
+summary(modmo1)
+#El modelo no mejora, por lo tanto sería mejor modelo1 con todas las observaciones

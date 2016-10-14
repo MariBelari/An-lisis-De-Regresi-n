@@ -1,0 +1,31 @@
+### Práctica13 (13.10.16)
+
+#####################################13.10.16]###########################################
+#ej. 1 mrm corredor de bolsa
+#--PREDICCIÓN-------------------------------------------------
+  
+  
+  inter <- seq(min(bolsa$uso), max(bolsa$uso), length=length(bolsa$uso))
+  #Rango para la variable 
+  #Genera predicción 
+  inter 
+  bolpred <-data.frame(gama=3.5, operacion=2.5, uso= inter)
+  predi1 <-predict(modmo, bolpred, interval="prediction", se.fit=TRUE, data=bolsa)
+  head(predi1$fit)
+  
+  
+#MULTICOLINEALIDAD
+  # Cuando un modelo tiene multicolinealidad en un MRM es cuando una var independiente
+  # es combinacion lineal de otra var indep. i.e. la multicolinealidad existe enn un MRM
+  # si hay fuerte correlacion entre 2 o más var indep., esto es cuando tengamos un coef
+  # de correlacion igual a 1
+  # Para detectar esta colinealidad se estima el factor de inflacion de la varianza (vif)
+  # Para este calculo se recomiendad estos rangos:
+  # fiv estado de los predictores
+  # fiv=1 no correlacionados
+  # 1 < fiv < 5 moderadamente correlacionados
+  # fiv > 5 a 10 altamente correlacionada
+  
+  install.packages("car")
+  require(car)
+  vif(mbolsa)

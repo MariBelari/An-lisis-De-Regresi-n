@@ -1,0 +1,64 @@
+setwd("C://Users//SALA-C15//Desktop//Regresion")
+  
+install.packages("foreign")
+require(foreign)
+SDEMT215 <- data.frame(read.dbf("SDEMT215.dbf"))
+
+
+    ## RECODIFICACION DE VARIABLES NUMERICAS (RANGOS)
+
+# Método 1
+
+SDEMT215$EDAD11[as.numeric(SDEMT215$EDA) >=0 & as.numeric(SDEMT215$EDA) <=10] <-1
+SDEMT215$EDAD11[as.numeric(SDEMT215$EDA) >=11 & as.numeric(SDEMT215$EDA) <=20] <-2
+SDEMT215$EDAD11[as.numeric(SDEMT215$EDA) >=21 & as.numeric(SDEMT215$EDA) <=30] <-3
+SDEMT215$EDAD11[as.numeric(SDEMT215$EDA) >=31 & as.numeric(SDEMT215$EDA) <=40] <-4
+SDEMT215$EDAD11[as.numeric(SDEMT215$EDA) >=41] <-5
+
+ls(SDEMT215) #Lista de variables de la BD
+table(SDEMT215$EDAD11)
+
+class(SDEMT215$ENT) #Ver tipo de clase de la variable
+
+SDEMT215 <- (as.character(as.numeric(SDEMT215$ENT)) #Cambiar tipo de variable
+    
+
+# Método 2 #
+SDEMT215$EDAD111 <- ifelse(as.numeric(SDEMT215$EDA) >=0 & as.numeric(SDEMT215$EDA) <=10,1,
+                           ifelse(as.numeric(SDEMT215$EDA) >=11 & as.numeric(SDEMT215$EDA)<=20,2,
+                                  ifelse(as.numeric(SDEMT215$EDA) >=21 & as.numeric(SDEMT215$EDA)<=30,3,
+                                         ifelse(as.numeric(SDEMT215$EDA) >=31 & as.numeric(SDEMT215$EDA)<=40,4,5))))
+
+table(SDEMT215$EDAD111)
+
+
+
+    ## RECODIFICACION DE VARIABLES TIPO CARACTER
+
+class(SDEMT215$R_DEF)
+
+SDEMT215$VALIDO[as.character(SDEMT215$R_DEF)!="00"] <- "Entrevista incompleta" #dentro de la BD crear una nueva variable
+#donde tenga un valor diferente de cero
+SDEMT215$VALIDO[as.character(SDEMT215$R_DEF)=="00"] <- "Entrevista completa"
+# caracter o cadena, valores con comillas
+table(SDEMT215$VALIDO)
+
+
+    ## SUBCONJUNTO DE DATOS
+# Seleccionando variables de interés
+
+# Método 1: Crear un vector con las variables de interés, crear otra BD, con las columnas seleccionadas
+
+var <- c("R_DEF", "LOC", "MUN", "C_RES") #Para vector siempre "c"
+newdata1 <- SDEMT215[,var]
+
+# Seleccionar casos u observaciones
+# funcion: subset()
+help(subset)
+
+mujer <- subset(SDEMT215, SDEMT215$SEX==2)
+table(mujer$SEX)
+
+mujer$CD_A <- as.character(mujer$CD_A)
+mujer1 <- subset(mujer, mujer$CD_A== "02" | mujer$CD_A=="16")
+table(mujer1$CD_A)

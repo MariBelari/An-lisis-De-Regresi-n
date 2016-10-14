@@ -1,0 +1,27 @@
+### Práctica12 (07.10.16)
+
+#----------------------------- 07/10/16 --------------------------------------------------------
+
+mod2 <- lm (precio~calidad, data = moch)
+#Aplicar los supuestos para ver si tenemos un buen modelo
+
+moch$ajus <- fitted(mod2)
+moch$resi <- residuals(mod2)
+moch$rstud <- rstudent(mod2)
+
+#NORMALIDAD
+install.packages("lmtest")
+require(lmtest)
+ks.test(moch$rstud, "pnorm")
+
+#HISTOGRAMA
+hist(moch$rstud, xlab = "Residuales", main = "Hist residuales")
+#El p-value para el contraste de normalidad es mayor que 0.05 (p=0.9719) y además el histograma
+#se parece a una dist. normal, entonces no hay problemas de normalidad
+
+#HOMOGENEIDAD DE VARIANZAS
+bptest(mod2, studentize = FALSE, data = moch)
+#Significación p=0.4154, mayor de 0.05, por lo que podemos decir que la varianza es constante
+#a lo largo de la muestra
+dwtest(mod2, alternative = "two.sided", data = moch)
+#Aceptamos la hipotesis nuka de que no existe correlacion entre los residuos con un p-value>0.05

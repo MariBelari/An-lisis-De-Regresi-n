@@ -1,0 +1,40 @@
+####Práctica1 (11.08.16)
+
+sample (10000, 35)
+help(sample)
+
+## Crear una pequeña base de datos ##
+
+# 4 variables: nombre, edad, sexo, tipo de educación #
+nombres <- c ("Sergio", "Alan", "Betzabeth", "Judith", "Rodrigo", "Eric", "Diego",
+              "Angel")
+edad <- c (36, 20, 23, 20, 21, 21, 22, 21)
+sexo <- c("Hombre", "Hombre", "Mujer", "Mujer", "Hombre", "Hombre", "Hombre", 
+          "Hombre")
+teduca <- c("Pública", "Pública", "Pública", "Pública", "Privada", "Pública", 
+            "Pública", "Pública")
+
+# Generamos una base en forma de matriz #
+base1 <- matrix (c(edad, nombres, sexo, teduca))
+help(matrix)
+
+# Crear base con data frame #
+base1.1 <- data.frame(nombres, edad, sexo, teduca)
+
+# Utiliza función table #
+# La función table se utiliza para conocer la frecuencia de las diferentes #
+# variables #
+table(base1.1$edad)
+table(base1.1$sexo)
+
+attach(base1.1) #adjuntar
+table(edad) 
+detach(base1.1) #desadjuntar
+summary (base1.1$edad) #resumen
+
+# Importar base de datos #
+# Se utiliza el paquete foreign #
+install.packages("foreign")
+require (foreign)
+sociodem <- read.dbf("C://Users//SALA-C13//Desktop//Regresion//SDEMT215.dbf")
+table(sociodem$SEX)

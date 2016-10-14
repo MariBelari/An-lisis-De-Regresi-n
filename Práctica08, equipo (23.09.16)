@@ -1,0 +1,31 @@
+### Práctica8, equipo (23.09.16)
+
+#TRABAJO EN EQUIPO#
+#Beltrán Arizmendi María; Nava Celis Dennya#
+
+
+#MODELO DE REGRESIÓN LINEAL SIMPLE#
+#Elegir 2 variables: 22 y 88
+#Modelo: diagrama de dispersion, correlacion, tabla anova, 4 supuestos, predicción
+
+
+#Mandar llamar la base de datos 
+install.packages("foreign")
+require(foreign)
+sdemt216 <- read.dbf("C://Users//SALA-E16//Desktop//Regresion//sdemt216.dbf")
+
+estado <- subset(sdemt216,sdemt216$ENT == "08")
+
+estado$ANIOS_ESC  <- as.numeric(estado$ANIOS_ESC)
+estudios <- c(estado$ANIOS_ESC)
+
+estado$INGOCUP <- as.numeric(estado$INGOCUP)
+ingreso <- c(estado$INGOCUP)
+
+
+#Grafico de dispersiÓn
+plot (estudios, ingreso, pch= 3, xlab="Años de escolaridad", ylab="Ingreso mensual", main="Grafico de dispersion", col=20)
+
+#Correlaciones
+cor(estudios, ingreso, method="pearson")
+cor.test(estudios, ingreso, method="pearson")

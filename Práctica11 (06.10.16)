@@ -1,0 +1,60 @@
+### Práctica11 (06.10.16)
+
+#-------------------------06/10/16----------------------------------------------------------------
+plot(capa, precio, pch=12, xlab="capa", ylab="precio", main = "Grafica de dispersion", col="blue")
+cor(precio, capa, method = "pearson")
+cor.test(precio, capa, method = "pearson")
+#Comparación de modelos
+#Pretendemos seleccionar al mejor subconjunto de variables independientes, en este caso
+#para la aplicacion de MRM tenemos 2 variables independientes (calidad y capacidad)
+#por lo que se propone comparar 3 modelos con la finalidad de aplicar el principio
+#de parsimonia, conocer var independientes innecesarias, evitar multicolinealiada, i.e., que
+#se tienen muchas variables intentando explicar el modelo 
+#Los 3 modelos: 1)precio~capacidad; 2)precio~calidad; 3)precio~calidad+capacidad
+#Cómo seleccionar el mejor modelo?
+#Criterio de información de Akaike (AIC)
+#El problema de utilizar R^2 para comparar modelos es que al introducir nuevas variables
+#al modelo, esta medida siempre crece. Si estamos decidiendo cual de todos los
+#modelos ajusta mejor a los datos, el modelo con más var independientes siempre sera
+#el mejor ajustando. Por eso se utiliza AIC, una medida de ajuste que penaliza el modelo
+
+#AIC=(n)(log(SCR/n))2k
+#SCR= suma de cuadrados residuales
+#n es el numero de casos en el modelo
+#k es el numero de variables independientes
+#El problema es que el unico criterio para el AIC es:
+#si el aic es mayor al modelo es peor, si el aic es menor el modelo es mejor, i.e.,
+#esperamos un aic más pequeño
+#El aic nos va ayudar a decidir sobre el modelo
+#El método mas recomendado es el metodo step by step, dentro de él hay 3 modalidades
+#1)forward... parte del coeficiente B0 y de ahi va probando las variables independientes
+#para ver cual es la que mas aporta al modelo
+#**2)backward... R empieza con todas las var indep y estudia si el aic baja cuando hay
+#cambios de variables
+#3)both... empieza como el forward la diferencia es que se realizan test para conocer
+#el var indep util
+#** metodo más recomendable
+#Backward tiene un efecto represor que permite probar cuando unja var tiene influencia
+#solo si otra var se mantiene constante 
+moch <- data.frame(precio, capa, calidad)
+cor(moch, use = "everything", method = "pearson")
+mod1 <- lm(precio~capa+calidad, data = moch)
+summary(mod1)
+
+#BACKWARD
+step(mod1,direction = "backward")
+
+#El metodo step analizo 2 modelos 
+#1)precio~capa+calidad con un aic=83.9
+#2)precio~calidad con un aic=83.51
+#Elegiriamos modelo con aic menor, el 2)
+
+#BOTH
+step(mod1,direction = "both")
+#en este caso es el mismo resultado de backward
+
+#FORWARD
+step(mod1,direction = "forward")
+#se queda con el mejor modelo
+
+#EL MEJOR MODELO ES PRECIO~CALIDAD

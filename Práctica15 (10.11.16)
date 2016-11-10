@@ -1,0 +1,30 @@
+install.packages("foreign")
+require(foreign)
+setwd("C://Users//Sala-C20.RTIC-C20-HP//Desktop")
+
+install.packages("questionr")
+require(questionr)
+
+SDEM <- data.frame(read.dbf("sdemt216.dbf"))
+COE1 <- data.frame(read.dbf("coe1t216.dbf"))
+COE2 <- data.frame(read.dbf("coe2t216.dbf"))
+
+folio <- paste(SDEM$CD_A, SDEM$ENT, SDEM$CON, SDEM$V_SEL, SDEM$N_HOG, SDEM$H_MUD, SDEM$N_REN)
+x <- data.frame(SDEM, folio)
+
+folio <- paste(COE1$CD_A, COE1$ENT, COE1$CON, COE1$V_SEL, COE1$N_HOG, COE1$H_MUD, COE1$N_REN)
+x1 <- data.frame(COE1, folio)
+
+folio <- paste(COE2$CD_A, COE2$ENT, COE2$CON, COE2$V_SEL, COE2$N_HOG, COE2$H_MUD, COE2$N_REN)
+x2 <- data.frame(COE2, folio)
+
+total <- merge(x,x1,by="folio",all.x = TRUE)
+
+EnoeTotal <- merge(total, x2, by="folio", all.x = TRUE)
+
+table(EnoeTotal$SEX, EnoeTotal$P1)
+wtd.table(EnoeTotal$EDA.x, weights = EnoeTotal$FAC.x)
+sum(wtd.table(EnoeTotal$EDA.x, weights = EnoeTotal$FAC.x))
+
+
+#wtd.table(EnoeTotal$SEX, EnoeTotal$P1, weights = EnoeTotal$FAC.x)

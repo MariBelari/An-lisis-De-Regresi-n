@@ -1,0 +1,72 @@
+#MARÍA BELTRÁN ARIZMENDI
+
+install.packages("foreign")
+require(foreign)
+install.packages("questionr")
+require(questionr)
+install.packages("car")
+require(car)
+
+setwd("C://Users//Sala-C20.RTIC-C20-HP//Desktop")
+solo <- data.frame(read.spss("solorural.sav"))
+
+ls(solo)
+#POBLACION DE 5 A 17 AÑOS
+wtd.table(solo$sex,weights = solo$fac_mti,na.show=TRUE) #Niños= 4,061,217, Niñas= 3,800,117
+total <- 4061217+3800117
+total # total= 7,861,334
+
+
+#TAMAÑO MUESTRA
+table(solo$sex) #Niños= 9,302, Niñas= 8,798
+total1 <- 9302+8798
+total1 # total= 18,100
+
+#OCUPADOS
+ocupados <- subset(solo, solo$clase2=="1")
+wtd.table(ocupados$sex, weights = ocupados$fac_mti,na.show = TRUE) #Niños= 622,492, Niñas= 204,970
+total2 <- 622492+204970
+total2 #total= 827,462
+
+#% OCUPADOS
+porcentaje <- (total2/total)*100
+porcentaje #porcentaje= 10.52572%
+
+####CARACTERISTICAS INDIVIDUALES
+
+#OCUPADOS POR GRUPO DE EDAD
+attach(ocupados)
+ocupados$eda <- ifelse(as.numeric(eda)>=5 & as.numeric(eda)<=9,1, 
+                       ifelse(as.numeric(eda)>=10 & as.numeric(eda)<=13,2, 
+                              ifelse(as.numeric(eda)>=14 & as.numeric(eda)<=17,3,4)))
+ocupados$eda <- factor(ocupados$eda, levels=c(1,2,3,4), labels=c("5 a 9", "10 a 13","14 a 17", "Resto"))
+edad1 <- wtd.table(ocupados$eda, weights = ocupados$fac_mti)
+edad1
+#5 a 9 10 a 13 14 a 17   Resto 
+#0  158695  668767       0
+wtd.table(ocupados$sex, ocupados$eda, weights = ocupados$fac_mti)
+#          5 a 9 10 a 13 14 a 17  Resto
+#hombres      0  121416  501076      0
+#mujeres      0   37279  167691      0
+
+
+#OCUPADOS SEGUN ASISTENCIA ESCOLAR
+wtd.table(ocupados$asis, weights = ocupados$fac_mti)
+#Asiste No Asiste 
+#442632    384830 
+wtd.table(ocupados$sex, ocupados$asis, weights = ocupados$fac_mti)
+#        Asiste No Asiste
+#hombres 335572    286920
+#mujeres 107060     97910
+
+
+####CARACTERISTICAS DEL HOGAR
+
+#TAMAÑO DEL HOGAR
+wtd.table(ocupados$tam_hog, weights = ocupados$fac_mti)
+#1 a 3 integrantes  4 a 5 integrantes 6 a 7 intengrantes            8 y más 
+#80799             194033              87316              44020 
+wtd.table(ocupados$sex, ocupados$tam_hog, weights = ocupados$fac_mti)
+#         1 a 3 integrantes 4 a 5 integrantes 6 a 7 intengrantes 8 y más
+#hombres             55181            149312              65844   35190
+#mujeres             25618             44721              21472    8830

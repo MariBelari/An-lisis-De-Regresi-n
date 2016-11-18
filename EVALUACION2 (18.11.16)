@@ -1,0 +1,105 @@
+install.packages("foreign")
+require(foreign)
+install.packages("questionr")
+require(questionr)
+install.packages("car")
+require(car)
+install.packages("plyr") #recodificar
+require(plyr)
+install.packages("Hmisc")
+
+setwd("C://Users//Sala-C20.RTIC-C20-HP//Desktop")
+solo <- data.frame(read.spss("solorural.sav"))
+
+ocup <- subset(solo, solo$c_ocu=='ocupado')
+
+#VAR DEPEN: t_per
+
+table(solo$t_per) #Tipo de persona con que trabaja un niño: 1=familiar, 2=no familiar, 3=cuenta propia, 4=NE
+#1     2     3     4 
+#1615   588    75     1
+
+#RECODIFICAR: 3 categorías
+ocup$t_per <- revalue(factor(ocup$t_per), c("4"=NA))
+table(ocup$t_per)
+#1    2    3 
+#1615  588   75 
+
+#DE LAS VAR INDEP: sex + edad1(3 grupos) + asis + sex_jefe + escol_jefe + t_apo1 + ocu_jefe
+attach(ocup)
+ocup$eda <- ifelse(as.numeric(eda)>=5 & as.numeric(eda)<=9,1, 
+                       ifelse(as.numeric(eda)>=10 & as.numeric(eda)<=13,2, 
+                              ifelse(as.numeric(eda)>=14 & as.numeric(eda)<=17,3,4)))
+ocup$eda <- factor(ocup$eda, levels=c(1,2,3,4), labels=c("5 a 9", "10 a 13","14 a 17", "-"))
+edad1 <- wtd.table(ocup$eda, weights = ocup$fac_mti)
+edad1
+#5 a 9 10 a 13 14 a 17        
+#61442  252492  668767       
+
+sexo <- wtd.table(ocup$sex, weights = ocup$fac_mti)
+sexo
+#hombres mujeres 
+#733333  249368 
+
+asistencia <- wtd.table(ocup$asis, weights = ocup$fac_mti)
+asistencia
+#Asiste No Asiste 
+#588023    394678 
+
+sexo_jefe <- wtd.table(ocup$sex_jefe, weights = ocup$fac_mti)
+sexo_jefe
+#Hombre  Mujer 
+#391410  91655
+
+
+ocup$escol_jefe <- revalue(factor(ocup$escol_jefe), c("No especificado"= NA))
+escolaridad <- wtd.table(ocup$escol_jefe, weights = ocup$fac_mti)
+escolaridad
+#Sin instrucción                          Primaria incompleta 
+#87712                                       160962 
+#Primaria completa                        Secundaria incompleta 
+#126309                                        11239 
+#Secundaria completa    Algún año de preparatoria, equivalente y más 
+#70821                                        26022 
+
+apo1 <- wtd.table(ocup$t_apo1, weights = ocup$fac_mti)
+apo1
+#Beca para estudiar                   Otro programa de gobierno Ayuda de un familiar que vive en otro hogar 
+#397340                                      152788                                        8143 
+#Otro tipo de ayuda                        No ha recibido ayuda 
+#1474                                      422956 
+
+ocujefe <- wtd.table(ocup$ocu_jefe, weights = ocup$fac_mti)
+ocujefe
+#Ocupado Desocupado 
+#428591      54474 
+
+ocup$t_per <- revalue(factor(ocup$t_per), c("1"= "Familiar", "2"= "No familiar", "3"= "Cuenta propia"))
+empleador <- wtd.table(ocup$t_per, weights = ocup$fac_mti)
+empleador
+#Familiar   No familiar Cuenta propia 
+#708893        242620         30709 
+
+
+install.packages("nnet")
+require(nnet)
+mode1 <- multinom(t_per~1, data=ocup)
+#initial  value 2502.638794 
+#iter  10 value 1607.862171
+#final  value 1607.861278 
+
+modefin <- multinom(t_per~ sex + eda1 + asis + sex_jefe + escol_jefe + t_apo1 + ocu_jefe, data=ocup)
+#initial  value 1241.431886 
+#iter  10 value 737.589056
+#iter  20 value 712.034733
+#iter  30 value 709.802616
+#iter  40 value 709.745495
+#final  value 709.744092 
+g <- summary(modefin, wald = T)
+print(g)
+
+
+install.packages("stargazer")
+require(stargazer)
+s <- stargazer(modefin, type = "html", title = "coefficients", summary = T)
+stargazer(modefin, type="text", title = "mlogit", digits = 2, out = "C:\\Users\\Sala-C20.RTIC-C20-HP\\Desktop\\modelo.txt")
